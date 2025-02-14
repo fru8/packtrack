@@ -46,18 +46,18 @@ const Index = () => {
 
   const updateMutation = useMutation({
     mutationFn: async ({ index, value }: { index: number, value: string }) => {
-      // Creating URL-encoded form data
-      const formData = new FormData();
-      formData.append('index', String(index + 1)); // Add 1 because spreadsheet rows are 1-based
-      formData.append('value', value);
+      // Use URLSearchParams for the request
+      const params = new URLSearchParams();
+      params.append('index', String(index + 1)); // Add 1 because spreadsheet rows are 1-based
+      params.append('value', value);
 
       const response = await axios({
         method: 'post',
-        url: APPS_SCRIPT_URL,
-        data: formData,
+        url: `${APPS_SCRIPT_URL}?${params.toString()}`,
+        // Using no-cors mode and minimal headers
         headers: {
-          'Content-Type': 'multipart/form-data',
-        }
+          'Accept': 'application/json',
+        },
       });
       return response.data;
     },
