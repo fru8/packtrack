@@ -1,5 +1,5 @@
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
 import {
@@ -20,6 +20,8 @@ interface DataRow {
 }
 
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRzhT3ACLoKbVHzGpaslY_l4cBCUqNf5kUh6QRlACgIFsQtBTHiiQya7eAt28DGselPyGxBd7NWY85G/pub?output=csv";
+// Replace this URL with your deployed Google Apps Script Web App URL
+const APPS_SCRIPT_URL = "YOUR_DEPLOYED_APPS_SCRIPT_URL";
 
 const Index = () => {
   const { toast } = useToast();
@@ -43,20 +45,48 @@ const Index = () => {
     },
   });
 
-  const handleIncrement = (index: number, amount: number) => {
+  const updateMutation = useMutation({
+    mutationFn: async ({ index, value }: { index: number, value: string }) => {
+      const response = await axios.post(APPS_SCRIPT_URL, {
+        index: index + 1, // Add 1 because spreadsheet rows are 1-based
+        value
+      });
+      return response.data;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Value updated in the spreadsheet",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update the spreadsheet",
+        variant: "destructive",
+      });
+      // Refresh data to ensure we're in sync
+      refetch();
+    },
+  });
+
+  const handleIncrement = async (index: number, amount: number) => {
+    const newValue = parseInt(localData[index].value) + amount;
+    
+    // Update local state immediately for responsiveness
     setLocalData((prev) => {
       const newData = [...prev];
-      const currentValue = parseInt(newData[index].value) || 0;
       newData[index] = {
         ...newData[index],
-        value: String(currentValue + amount),
+        value: String(newValue),
       };
       return newData;
     });
-    
-    toast({
-      title: "Value updated",
-      description: "The changes will be saved to the spreadsheet soon.",
+
+    // Send update to Google Sheet
+    updateMutation.mutate({
+      index,
+      value: String(newValue),
     });
   };
 
@@ -118,6 +148,7 @@ const Index = () => {
                           variant="outline"
                           size="sm"
                           onClick={() => handleIncrement(index, -1)}
+                          disabled={updateMutation.isPending}
                         >
                           <MinusIcon className="w-4 h-4" />
                         </Button>
@@ -125,6 +156,7 @@ const Index = () => {
                           variant="outline"
                           size="sm"
                           onClick={() => handleIncrement(index, 1)}
+                          disabled={updateMutation.isPending}
                         >
                           <PlusIcon className="w-4 h-4" />
                         </Button>
@@ -138,7 +170,7 @@ const Index = () => {
         </div>
 
         <div className="text-center text-sm text-gray-500">
-          <p>Changes are automatically saved</p>
+          <p>Changes are automatically saved to the spreadsheet</p>
         </div>
       </div>
     </div>
