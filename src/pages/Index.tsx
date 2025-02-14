@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
@@ -11,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { MinusIcon, PlusIcon, RefreshCwIcon } from "lucide-react";
 
 interface DataRow {
@@ -45,9 +46,18 @@ const Index = () => {
 
   const updateMutation = useMutation({
     mutationFn: async ({ index, value }: { index: number, value: string }) => {
-      const response = await axios.post(APPS_SCRIPT_URL, {
-        index: index + 1, // Add 1 because spreadsheet rows are 1-based
-        value
+      // Creating URL-encoded form data
+      const formData = new FormData();
+      formData.append('index', String(index + 1)); // Add 1 because spreadsheet rows are 1-based
+      formData.append('value', value);
+
+      const response = await axios({
+        method: 'post',
+        url: APPS_SCRIPT_URL,
+        data: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
       });
       return response.data;
     },
@@ -56,8 +66,11 @@ const Index = () => {
         title: "Success",
         description: "Value updated in the spreadsheet",
       });
+      // Refresh data after successful update
+      refetch();
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Update error:', error);
       toast({
         title: "Error",
         description: "Failed to update the spreadsheet",
