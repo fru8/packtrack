@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
@@ -20,8 +19,7 @@ interface DataRow {
 }
 
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRzhT3ACLoKbVHzGpaslY_l4cBCUqNf5kUh6QRlACgIFsQtBTHiiQya7eAt28DGselPyGxBd7NWY85G/pub?output=csv";
-// Replace this URL with your deployed Google Apps Script Web App URL
-const APPS_SCRIPT_URL = "YOUR_DEPLOYED_APPS_SCRIPT_URL";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbycOtCLQuQIsu35OnsSCuJ0ZmRs1N5CEv1bsxOAOhTBNtN2a0NjYdXr78DqtHaj5BmsWg/exec";
 
 const Index = () => {
   const { toast } = useToast();
