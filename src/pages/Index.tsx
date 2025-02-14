@@ -20,7 +20,7 @@ interface DataRow {
 }
 
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRzhT3ACLoKbVHzGpaslY_l4cBCUqNf5kUh6QRlACgIFsQtBTHiiQya7eAt28DGselPyGxBd7NWY85G/pub?output=csv";
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbycOtCLQuQIsu35OnsSCuJ0ZmRs1N5CEv1bsxOAOhTBNtN2a0NjYdXr78DqtHaj5BmsWg/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzCoVTQrWmFgHBE2LiebXtHJK3NwW-wirbkduFlYqQf1-RrC_9KTWi8LqAi4iZuKNwzXA/exec";
 
 const Index = () => {
   const { toast } = useToast();
